@@ -12,6 +12,10 @@ jobs:
     name: get version and create release
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          path: siyuan-plugin
+
       - name: version check
         id: version
         run: |
@@ -42,15 +46,15 @@ jobs:
       - name: clone origin and apply patches
         run: |
           mkdir -p ${{ github.workspace }}/go
-          cd ${{ github.workspace }}/
+          cd ${{ github.workspace }}/siyuan-plugin
           echo `ls -la`
     
           git clone --depth=1 https://github.com/IAliceBobI/sy-progressive-plugin.git
           cd sy-progressive-plugin
     
-          git apply ${{ github.workspace }}/patches/user.patch
-          git apply ${{ github.workspace }}/patches/Settings.patch
-          git apply ${{ github.workspace }}/patches/IndexConf.patch
+          git apply ${{ github.workspace }}/siyuan-plugin/patches/user.patch
+          git apply ${{ github.workspace }}/siyuan-plugin/patches/Settings.patch
+          git apply ${{ github.workspace }}/siyuan-plugin/patches/IndexConf.patch
     
           git status
     
