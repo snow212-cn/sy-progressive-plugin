@@ -45,7 +45,7 @@ jobs:
           ls -a
           cd ${{ github.workspace }}/
     
-          git clone --branch master --depth=1 https://github.com/IAliceBobI/sy-progressive-plugin.git
+          git clone --depth=1 https://github.com/IAliceBobI/sy-progressive-plugin.git
           cd sy-progressive-plugin
     
           git apply ${{ github.workspace }}/sy-progressive-plugin/patches/user.patch
