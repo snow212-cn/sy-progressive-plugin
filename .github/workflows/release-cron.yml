@@ -32,12 +32,12 @@ jobs:
           fi
 
           # packageManager=$(echo "${packageJson}" | grep "packageManager" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g')
-          packageManager = "npm"
-          echo "package_manager=${packageManager}" >> $GITHUB_OUTPUT 
+          # packageManager = "npm"
+          # echo "package_manager=${packageManager}" >> $GITHUB_OUTPUT 
 
           echo "releasedVersion: ${releasedVersion}"
           echo "packageVersion: ${packageVersion}"
-          echo "packageManager: ${packageManager}"
+          # echo "packageManager: ${packageManager}"
 
       - name: clone origin and apply patches
         run: |
