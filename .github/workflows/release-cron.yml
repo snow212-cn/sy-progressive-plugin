@@ -47,10 +47,9 @@ jobs:
         run: |
           mkdir -p ${{ github.workspace }}/go
           cd ${{ github.workspace }}/siyuan-plugin
-          echo `ls -la`
     
-          git clone --depth=1 https://github.com/IAliceBobI/sy-progressive-plugin.git
-          cd sy-progressive-plugin
+          git clone --depth=1 https://github.com/IAliceBobI/sy-progressive-plugin.git ./origin
+          cd origin
     
           git apply ${{ github.workspace }}/siyuan-plugin/patches/user.patch
           git apply ${{ github.workspace }}/siyuan-plugin/patches/Settings.patch
