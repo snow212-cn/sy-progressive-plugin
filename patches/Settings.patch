@@ -1,0 +1,14 @@
+diff --git a/sy-tomato-plugin/src/Settings.svelte b/sy-tomato-plugin/src/Settings.svelte
+index 97bea82..7eedfa1 100644
+--- a/sy-tomato-plugin/src/Settings.svelte
++++ b/sy-tomato-plugin/src/Settings.svelte
+@@ -126,7 +126,8 @@
+     let searchInput: HTMLElement = $state();
+     let buyDIV: HTMLElement = $state();
+     let searchKey = $state("");
+-    let codeValid = $state(false);
++    // let codeValid = $state(false);
++    let codeValid = $state(true);
+     let codeNotValid = $derived(!codeValid);
+     const SearchKeyItemKey =
+         "progressive_settings_SearchKeyItemKey_RfrUm9VLS4GehTzg5ygRrNT";
