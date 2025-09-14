@@ -42,7 +42,7 @@ jobs:
       - name: clone origin and apply patches
         run: |
           mkdir -p ${{ github.workspace }}/go
-          cd ${{ github.workspace }}/
+          cd ${{ github.workspace }}/123
     
           git clone --branch ${{ steps.version.outputs.release_version }} --depth=1 https://github.com/IAliceBobI/sy-progressive-plugin.git
           cd sy-progressive-plugin
