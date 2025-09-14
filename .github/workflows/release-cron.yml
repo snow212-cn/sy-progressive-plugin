@@ -72,7 +72,7 @@ jobs:
 
       - name: make zip package
         run: |
-          cd ${{ github.workspace }}/siyuan-plugin/origin/sy-tomato-plugin
+          cd ${{ github.workspace }}/siyuan-plugin/origin/sy-progressive-plugin
           echo `ls -la`
           cd build
           zip -r package.zip ./*
