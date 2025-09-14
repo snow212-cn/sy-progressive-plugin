@@ -51,9 +51,9 @@ jobs:
           git clone --depth=1 https://github.com/IAliceBobI/sy-progressive-plugin.git ./origin
           cd origin
 
-          # git apply --reject ${{ github.workspace }}/siyuan-plugin/patches/user.patch
-          git apply --reject ${{ github.workspace }}/siyuan-plugin/patches/Settings.patch
-          git apply --reject ${{ github.workspace }}/siyuan-plugin/patches/IndexConf.patch
+          git apply --ignore-whitespace ${{ github.workspace }}/siyuan-plugin/patches/user.patch
+          git apply --ignore-whitespace ${{ github.workspace }}/siyuan-plugin/patches/Settings.patch
+          git apply --ignore-whitespace ${{ github.workspace }}/siyuan-plugin/patches/IndexConf.patch
     
           git status
     
