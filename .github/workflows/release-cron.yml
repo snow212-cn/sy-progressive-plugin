@@ -48,9 +48,9 @@ jobs:
           git clone --depth=1 https://github.com/IAliceBobI/sy-progressive-plugin.git
           cd sy-progressive-plugin
     
-          git apply ${{ github.workspace }}/sy-progressive-plugin/patches/user.patch
-          git apply ${{ github.workspace }}/sy-progressive-plugin/patches/Settings.patch
-          git apply ${{ github.workspace }}/sy-progressive-plugin/patches/IndexConf.patch
+          git apply ${{ github.workspace }}/patches/user.patch
+          git apply ${{ github.workspace }}/patches/Settings.patch
+          git apply ${{ github.workspace }}/patches/IndexConf.patch
     
           git status
     
