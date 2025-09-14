@@ -74,6 +74,7 @@ jobs:
         run: |
           cd build
           zip -r package.zip ./*
+          echo `ls -la`
           mv package.zip ..
 
       - name: Create Release
