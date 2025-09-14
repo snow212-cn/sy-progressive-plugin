@@ -1,7 +1,7 @@
-diff --git a/sy-tomato-plugin/src/Settings.svelte b/sy-tomato-plugin/src/Settings.svelte
+diff --git a/sy-progressive-plugin/src/Settings.svelte b/sy-progressive-plugin/src/Settings.svelte
 index 97bea82..7eedfa1 100644
---- a/sy-tomato-plugin/src/Settings.svelte
-+++ b/sy-tomato-plugin/src/Settings.svelte
+--- a/sy-progressive-plugin/src/Settings.svelte
++++ b/sy-progressive-plugin/src/Settings.svelte
 @@ -126,7 +126,8 @@
      let searchInput: HTMLElement = $state();
      let buyDIV: HTMLElement = $state();
