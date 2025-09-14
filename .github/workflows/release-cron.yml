@@ -83,13 +83,13 @@ jobs:
         uses: ncipollo/release-action@v1
         if: ${{ steps.version.outputs.release_version != '0' }}
         with:
-          name: ${{ steps.version.outputs.release_version }}.zip
+          name: ${{ steps.version.outputs.release_version }}
           tag: ${{ steps.version.outputs.release_version }}
           body: "action release"
           draft: false
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "${{ github.workspace }}/siyuan-plugin/origin/sy-tomato-plugin/package.zip"
+          artifacts: "${{ github.workspace }}/siyuan-plugin/origin/sy-progressive-plugin/package.zip"
 
       # - name: Release
       #   uses: ncipollo/release-action@v1
