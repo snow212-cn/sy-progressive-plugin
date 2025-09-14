@@ -64,9 +64,9 @@ jobs:
           cache-dependency-path: ${{ github.workspace }}/siyuan-plugin/origin/package-lock.json
       - name: Install dependencies
         run: |
-          cd ${{ github.workspace }}/siyuan-plugin/origin/
+          cd ${{ github.workspace }}/siyuan-plugin/origin/sy-tomato-plugin
           npm i
-          cd sy-progressive-plugin
+          cd ../sy-progressive-plugin
           npm i
           npm run build
 
