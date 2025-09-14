@@ -56,7 +56,8 @@ jobs:
           git apply --ignore-whitespace ${{ github.workspace }}/siyuan-plugin/patches/IndexConf.patch
     
           git status
-    
+
+      - run: ls -la
       - uses: actions/setup-node@v4
         with:
           node-version: 22
