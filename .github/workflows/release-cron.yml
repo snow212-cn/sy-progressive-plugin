@@ -74,9 +74,10 @@ jobs:
         run: |
           cd ${{ github.workspace }}/siyuan-plugin/origin/sy-progressive-plugin
           echo `ls -la`
-          cd build
-          zip -r package.zip ./*
-          mv package.zip ..
+          # cd build
+          mv build sy-progressive-plugin
+          zip -r package.zip ./sy-progressive-plugin
+          # mv package.zip ..
 
       - name: Create Release
         id: create_release
