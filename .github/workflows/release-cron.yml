@@ -57,7 +57,6 @@ jobs:
     
           git status
 
-      - run: cd ${{ github.workspace }}/siyuan-plugin/origin/
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -65,6 +64,7 @@ jobs:
           cache-dependency-path: ${{ github.workspace }}/siyuan-plugin/origin/package-lock.json
       - name: Install dependencies
         run: |
+          cd ${{ github.workspace }}/siyuan-plugin/origin/
           npm i
           cd sy-progressive-plugin
           npm i
