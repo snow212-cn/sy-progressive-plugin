@@ -15,6 +15,7 @@ jobs:
       - name: Workflows keepalive
         uses: Fgerthoffert/actions-workflow-keepalive@v1.0.1
         with:
+          org: zencrepes
           token: "${{secrets.GITHUB_TOKEN}}"
       
       - uses: actions/checkout@v4
