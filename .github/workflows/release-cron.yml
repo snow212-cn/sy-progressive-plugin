@@ -12,6 +12,11 @@ jobs:
     name: get version and create release
     runs-on: ubuntu-latest
     steps:
+      - name: Workflows keepalive
+        uses: Fgerthoffert/actions-workflow-keepalive@v1.0.1
+        with:
+          token: "${{secrets.GITHUB_TOKEN}}"
+      
       - uses: actions/checkout@v4
         with:
           path: siyuan-plugin
