@@ -128,8 +128,3 @@ jobs:
             --target "$GITHUB_SHA" \
             --title "$release_tag" \
             --notes "Automated build from $UPSTREAM_REPO."
-          rm -rf package
-          mkdir -p package/sy-progressive-plugin
-          cp -a build/. package/sy-progressive-plugin/
-          cd package
-          zip -qr package.zip sy-progressive-plugin
