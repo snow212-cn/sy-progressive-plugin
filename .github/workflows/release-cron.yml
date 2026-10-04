@@ -133,10 +133,3 @@ jobs:
           cp -a build/. package/sy-progressive-plugin/
           cd package
           zip -qr package.zip sy-progressive-plugin
-
-          gh release create "$release_tag" \
-            package.zip \
-            --repo "$GITHUB_REPOSITORY" \
-            --target "$GITHUB_SHA" \
-            --title "$release_tag" \
-            --notes "Automated build from $UPSTREAM_REPO."
