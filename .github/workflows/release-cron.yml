@@ -69,7 +69,7 @@ jobs:
             "$GITHUB_WORKSPACE/patches/Settings.patch"
           do
             echo "Checking $(basename "$patch")..."
-            if ! output=$(git apply --check --ignore-whitespace "$patch" 2>&1); then
+            if ! output=$(git apply --check --ignore-whitespace --unidiff-zero "$patch" 2>&1); then
               echo "$output"
               if grep -q "corrupt patch" <<< "$output"; then
                 echo "::error file=$patch::Patch file is malformed."
