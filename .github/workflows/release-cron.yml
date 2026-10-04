@@ -27,11 +27,9 @@ jobs:
           sparse-checkout-cone-mode: true
 
       - name: Sync, validate patches, build and release
-        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set -euo pipefail
 
           package_version=$(curl --fail --silent --show-error --retry 3 \
             "https://raw.githubusercontent.com/$UPSTREAM_REPO/refs/heads/main/plugin.json" | jq -r '.version')
@@ -42,7 +40,6 @@ jobs:
           fi
 
           release_tag="v$package_version"
-          echo "Upstream version: $release_tag"
 
           if gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release $release_tag already exists. Nothing to build."
@@ -53,9 +50,6 @@ jobs:
             "https://github.com/$UPSTREAM_REPO.git" upstream
 
           cd upstream
-          
-          # 上游部分文件使用 CRLF，而 patch 使用 LF。
-          # git apply 不会自动把 CRLF/LF 上下文差异视为相同，因此先统一相关文件换行。
           sed -i 's/\r$//' sy-tomato-plugin/src/libs/user.ts
           sed -i 's/\r$//' sy-progressive-plugin/src/Settings.svelte
           
@@ -63,7 +57,6 @@ jobs:
             "$GITHUB_WORKSPACE/patches/user.patch" \
             "$GITHUB_WORKSPACE/patches/Settings.patch"
           do
-            echo "Checking $(basename "$patch")..."
             if ! output=$(git apply --check --ignore-whitespace --unidiff-zero "$patch" 2>&1); then
               echo "$output"
               if grep -q "corrupt patch" <<< "$output"; then
@@ -88,10 +81,8 @@ jobs:
             upstream/sy-progressive-plugin/package-lock.json
 
       - name: Install dependencies in parallel
-        shell: bash
         working-directory: upstream
         run: |
-          set -euo pipefail
 
           npm install --prefix sy-tomato-plugin --no-audit --no-fund &
           tomato_pid=$!
@@ -106,17 +97,12 @@ jobs:
           exit "$status"
 
       - name: Build progressive plugin
-        shell: bash
         working-directory: upstream
         run: npm run build --prefix sy-progressive-plugin
 
       - name: Package and publish
-        shell: bash
         working-directory: upstream/sy-progressive-plugin
         run: |
-          set -euo pipefail
-
-          rm -rf package
           mkdir -p package/sy-progressive-plugin
           cp -a build/. package/sy-progressive-plugin/
           cd package
