@@ -59,15 +59,23 @@ jobs:
 
           cd upstream
 
+          # Git stores some upstream text files with CRLF. Normalize only files
+          # touched by our patches so LF-formatted patch files apply reliably.
+          sed -i 's/\r$//' sy-tomato-plugin/src/libs/user.ts
+          sed -i 's/\r$//' sy-progressive-plugin/src/Settings.svelte
+
           for patch in \
             "$GITHUB_WORKSPACE/patches/user.patch" \
-            "$GITHUB_WORKSPACE/patches/Settings.patch" \
-            # "$GITHUB_WORKSPACE/patches/IndexConf.patch"
+            "$GITHUB_WORKSPACE/patches/Settings.patch"
           do
             echo "Checking $(basename "$patch")..."
-            if ! git apply --check --ignore-whitespace "$patch"; then
-              echo "::error file=$patch::Patch no longer applies cleanly to upstream main."
-              echo "Update the patch before publishing a new build."
+            if ! output=$(git apply --check --ignore-whitespace "$patch" 2>&1); then
+              echo "$output"
+              if grep -q "corrupt patch" <<< "$output"; then
+                echo "::error file=$patch::Patch file is malformed."
+              else
+                echo "::error file=$patch::Patch does not apply to the current upstream source."
+              fi
               exit 1
             fi
             git apply --ignore-whitespace "$patch"
