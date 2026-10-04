@@ -1,14 +1,9 @@
 diff --git a/sy-progressive-plugin/src/Settings.svelte b/sy-progressive-plugin/src/Settings.svelte
-index 97bea82..7eedfa1 100644
 --- a/sy-progressive-plugin/src/Settings.svelte
 +++ b/sy-progressive-plugin/src/Settings.svelte
-@@ -126,7 +126,8 @@
-     let searchInput: HTMLElement = $state();
-     let buyDIV: HTMLElement = $state();
-     let searchKey = $state("");
--    let codeValid = $state(false);
-+    // let codeValid = $state(false);
+@@ -46,7 +46,7 @@
+     // 永不挂，借用会恒 true 让激活卡对未激活用户谎报已激活）；面板打开时启动 verify 已
+     // 就位不闪，随后 UpgradeBar onMount verify 经 bind:codeValid 回写纠正；皮肤域
+     // 货架锁同吃此值（经 prop 下传 ProgConfSkins）
+-    let codeValid = $state(lastVerifyResult() === true);
 +    let codeValid = $state(true);
-     let codeNotValid = $derived(!codeValid);
-     const SearchKeyItemKey =
-         "progressive_settings_SearchKeyItemKey_RfrUm9VLS4GehTzg5ygRrNT";
