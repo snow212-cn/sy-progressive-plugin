@@ -105,12 +105,29 @@ jobs:
 
           exit "$status"
 
-          # Upstream package-lock.json may lag behind package.json between releases.
-          # npm ci intentionally fails on such a mismatch; npm install resolves the
-          # current manifests and refreshes the temporary lockfile in the build clone.
-          npm run build --prefix sy-progressive-plugin
+      - name: Build progressive plugin
+        shell: bash
+        working-directory: upstream
+        run: npm run build --prefix sy-progressive-plugin
 
-          cd sy-progressive-plugin
+      - name: Package and publish
+        shell: bash
+        working-directory: upstream/sy-progressive-plugin
+        run: |
+          set -euo pipefail
+
+          rm -rf package
+          mkdir -p package/sy-progressive-plugin
+          cp -a build/. package/sy-progressive-plugin/
+          cd package
+          zip -qr package.zip sy-progressive-plugin
+
+          gh release create "$release_tag" \
+            package.zip \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "$release_tag" \
+            --notes "Automated build from $UPSTREAM_REPO."
           rm -rf package
           mkdir -p package/sy-progressive-plugin
           cp -a build/. package/sy-progressive-plugin/
