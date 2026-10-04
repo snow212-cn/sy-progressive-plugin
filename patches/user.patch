@@ -1,11 +1,7 @@
 diff --git a/sy-tomato-plugin/src/libs/user.ts b/sy-tomato-plugin/src/libs/user.ts
 --- a/sy-tomato-plugin/src/libs/user.ts
 +++ b/sy-tomato-plugin/src/libs/user.ts
-@@ -31,4 +31,5 @@
- }
- 
- export async function verifyKeyProgressive() {
+@@ -34,1 +34,2 @@
 -    return verifyKey("_siyuanProgressiveCode_")
 +    _isValid.set(true);
 +    return true;
- }
