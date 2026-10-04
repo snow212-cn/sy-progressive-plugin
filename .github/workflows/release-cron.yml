@@ -78,7 +78,6 @@ jobs:
               fi
               exit 1
             fi
-            git apply --check --ignore-whitespace --unidiff-zero "$patch"
             git apply --ignore-whitespace --unidiff-zero "$patch"
           done
 
