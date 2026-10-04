@@ -1,9 +1,6 @@
 diff --git a/sy-progressive-plugin/src/Settings.svelte b/sy-progressive-plugin/src/Settings.svelte
 --- a/sy-progressive-plugin/src/Settings.svelte
 +++ b/sy-progressive-plugin/src/Settings.svelte
-@@ -46,7 +46,7 @@
-     // 永不挂，借用会恒 true 让激活卡对未激活用户谎报已激活）；面板打开时启动 verify 已
-     // 就位不闪，随后 UpgradeBar onMount verify 经 bind:codeValid 回写纠正；皮肤域
-     // 货架锁同吃此值（经 prop 下传 ProgConfSkins）
+@@ -47,1 +47,1 @@
 -    let codeValid = $state(lastVerifyResult() === true);
 +    let codeValid = $state(true);
