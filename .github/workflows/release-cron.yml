@@ -83,8 +83,11 @@ jobs:
 
           git diff --check
 
-          npm ci --prefix sy-tomato-plugin
-          npm ci --prefix sy-progressive-plugin
+          # Upstream package-lock.json may lag behind package.json between releases.
+          # npm ci intentionally fails on such a mismatch; npm install resolves the
+          # current manifests and refreshes the temporary lockfile in the build clone.
+          npm install --prefix sy-tomato-plugin --no-audit --no-fund
+          npm install --prefix sy-progressive-plugin --no-audit --no-fund
           npm run build --prefix sy-progressive-plugin
 
           cd sy-progressive-plugin
