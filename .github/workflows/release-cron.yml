@@ -1,105 +1,94 @@
-name: release-cron
+name: Build and Release
 
 on:
   schedule:
-    - cron: "0 0,23 * * 1,3,5" # 每周一三五的0,23点（UTC时间）
+    - cron: "17 0,12 * * 1,4"
   workflow_dispatch:
-  push:
-    tags:
-      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-progressive
+  cancel-in-progress: false
+
+env:
+  UPSTREAM_REPO: IAliceBobI/sy-progressive-plugin
+
 jobs:
-  create_release:
-    name: get version and create release
+  release:
+    name: Sync upstream, apply patches, build and release
     runs-on: ubuntu-latest
     steps:
-      - name: Workflows keepalive
-        uses: Fgerthoffert/actions-workflow-keepalive@v1.0.1
+      - name: Checkout patch files
+        uses: actions/checkout@v4
         with:
-          org: zencrepes
-          token: "${{secrets.GITHUB_TOKEN}}"
-      
-      - uses: actions/checkout@v4
-        with:
-          path: siyuan-plugin
+          sparse-checkout: patches
+          sparse-checkout-cone-mode: true
 
-      - name: version check
-        id: version
-        run: |
-          # 获取已经 release 的版本
-          releasedVersion=""
-          if ! releasedVersion=$(wget -qO- -t3 -T30 "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/latest" 2>/dev/null | grep "tag_name" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g'); then
-            echo "Warning: Failed to get latest release version, using default value" >> $GITHUB_OUTPUT
-            releasedVersion="v0.0.0"
-          fi
-          # 获取最新代码的版本
-          packageJson=$(wget -qO- -t3 -T30 "https://raw.githubusercontent.com/IAliceBobI/sy-progressive-plugin/refs/heads/main/plugin.json")
-          packageVersion=$(echo "${packageJson}" | grep "version" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g')
-          # 设置输出
-          if [ "${releasedVersion}" = "v${packageVersion}" ]; then
-            echo "release_version=0" >> $GITHUB_OUTPUT 
-          else
-            echo "release_version=v${packageVersion}" >> $GITHUB_OUTPUT 
-          fi
-
-          # packageManager=$(echo "${packageJson}" | grep "packageManager" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g')
-          # packageManager = "npm"
-          # echo "package_manager=${packageManager}" >> $GITHUB_OUTPUT 
-
-          echo "releasedVersion: ${releasedVersion}"
-          echo "packageVersion: ${packageVersion}"
-          # echo "packageManager: ${packageManager}"
-
-      - name: clone origin and apply patches
-        run: |
-          mkdir -p ${{ github.workspace }}/go
-          cd ${{ github.workspace }}/siyuan-plugin
-    
-          git clone --depth=1 https://github.com/IAliceBobI/sy-progressive-plugin.git ./origin
-          cd origin
-
-          git apply --ignore-whitespace ${{ github.workspace }}/siyuan-plugin/patches/user.patch
-          git apply --ignore-whitespace ${{ github.workspace }}/siyuan-plugin/patches/Settings.patch
-          git apply --ignore-whitespace ${{ github.workspace }}/siyuan-plugin/patches/IndexConf.patch
-    
-          git status
-
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-          cache-dependency-path: ${{ github.workspace }}/siyuan-plugin/origin/package-lock.json
-      - name: Install dependencies
+
+      - name: Sync, validate patches, build and release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cd ${{ github.workspace }}/siyuan-plugin/origin/sy-tomato-plugin
-          npm i
-          cd ../sy-progressive-plugin
-          npm i
-          npm run build
+          set -euo pipefail
 
-      - name: make zip package
-        run: |
-          cd ${{ github.workspace }}/siyuan-plugin/origin/sy-progressive-plugin
-          echo `ls -la`
-          # cd build
-          mv build sy-progressive-plugin
-          zip -r package.zip ./sy-progressive-plugin
-          # mv package.zip ..
+          package_version=$(curl --fail --silent --show-error --retry 3 \
+            "https://raw.githubusercontent.com/$UPSTREAM_REPO/refs/heads/main/plugin.json" | jq -r '.version')
 
-      - name: Create Release
-        id: create_release
-        uses: ncipollo/release-action@v1
-        if: ${{ steps.version.outputs.release_version != '0' }}
-        with:
-          name: ${{ steps.version.outputs.release_version }}
-          tag: ${{ steps.version.outputs.release_version }}
-          body: "action release"
-          draft: false
-          prerelease: false
-          token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "${{ github.workspace }}/siyuan-plugin/origin/sy-progressive-plugin/package.zip"
+          if [[ -z "$package_version" || "$package_version" == "null" ]]; then
+            echo "::error::Unable to read upstream plugin.json version."
+            exit 1
+          fi
 
-      # - name: Release
-      #   uses: ncipollo/release-action@v1
-      #   with:
-      #     artifacts: "package.zip"
-      #     prerelease: false
+          release_tag="v$package_version"
+          echo "Upstream version: $release_tag"
+
+          if gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $release_tag already exists. Nothing to build."
+            exit 0
+          fi
+
+          git clone --depth=1 --filter=blob:none \
+            "https://github.com/$UPSTREAM_REPO.git" upstream
+
+          cd upstream
+
+          for patch in \
+            "$GITHUB_WORKSPACE/patches/user.patch" \
+            "$GITHUB_WORKSPACE/patches/Settings.patch" \
+            "$GITHUB_WORKSPACE/patches/IndexConf.patch"
+          do
+            echo "Checking $(basename "$patch")..."
+            if ! git apply --check --ignore-whitespace "$patch"; then
+              echo "::error file=$patch::Patch no longer applies cleanly to upstream main."
+              echo "Update the patch before publishing a new build."
+              exit 1
+            fi
+            git apply --ignore-whitespace "$patch"
+          done
+
+          git diff --check
+
+          npm ci --prefix sy-tomato-plugin
+          npm ci --prefix sy-progressive-plugin
+          npm run build --prefix sy-progressive-plugin
+
+          cd sy-progressive-plugin
+          rm -rf package
+          mkdir -p package/sy-progressive-plugin
+          cp -a build/. package/sy-progressive-plugin/
+          cd package
+          zip -qr ../package.zip sy-progressive-plugin
+
+          gh release create "$release_tag" \
+            package.zip \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "$release_tag" \
+            --notes "Automated build from $UPSTREAM_REPO."
