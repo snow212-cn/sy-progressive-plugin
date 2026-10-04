@@ -58,12 +58,12 @@ jobs:
             "https://github.com/$UPSTREAM_REPO.git" upstream
 
           cd upstream
-
-          # Git stores some upstream text files with CRLF. Normalize only files
-          # touched by our patches so LF-formatted patch files apply reliably.
+          
+          # 上游部分文件使用 CRLF，而 patch 使用 LF。
+          # git apply 不会自动把 CRLF/LF 上下文差异视为相同，因此先统一相关文件换行。
           sed -i 's/\r$//' sy-tomato-plugin/src/libs/user.ts
           sed -i 's/\r$//' sy-progressive-plugin/src/Settings.svelte
-
+          
           for patch in \
             "$GITHUB_WORKSPACE/patches/user.patch" \
             "$GITHUB_WORKSPACE/patches/Settings.patch"
