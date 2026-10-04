@@ -26,11 +26,6 @@ jobs:
           sparse-checkout: patches
           sparse-checkout-cone-mode: true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
       - name: Sync, validate patches, build and release
         shell: bash
         env:
@@ -83,11 +78,36 @@ jobs:
 
           git diff --check
 
+      - name: Setup Node.js and restore npm cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            upstream/sy-tomato-plugin/package-lock.json
+            upstream/sy-progressive-plugin/package-lock.json
+
+      - name: Install dependencies in parallel
+        shell: bash
+        working-directory: upstream
+        run: |
+          set -euo pipefail
+
+          npm install --prefix sy-tomato-plugin --no-audit --no-fund &
+          tomato_pid=$!
+
+          npm install --prefix sy-progressive-plugin --no-audit --no-fund &
+          progressive_pid=$!
+
+          status=0
+          wait "$tomato_pid" || status=$?
+          wait "$progressive_pid" || status=$?
+
+          exit "$status"
+
           # Upstream package-lock.json may lag behind package.json between releases.
           # npm ci intentionally fails on such a mismatch; npm install resolves the
           # current manifests and refreshes the temporary lockfile in the build clone.
-          npm install --prefix sy-tomato-plugin --no-audit --no-fund
-          npm install --prefix sy-progressive-plugin --no-audit --no-fund
           npm run build --prefix sy-progressive-plugin
 
           cd sy-progressive-plugin
