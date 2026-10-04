@@ -95,7 +95,7 @@ jobs:
           mkdir -p package/sy-progressive-plugin
           cp -a build/. package/sy-progressive-plugin/
           cd package
-          zip -qr ../package.zip sy-progressive-plugin
+          zip -qr package.zip sy-progressive-plugin
 
           gh release create "$release_tag" \
             package.zip \
