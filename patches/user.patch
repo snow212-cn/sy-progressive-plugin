@@ -1,6 +1,7 @@
-diff --git a/sy-progressive-plugin/src/Settings.svelte b/sy-progressive-plugin/src/Settings.svelte
---- a/sy-progressive-plugin/src/Settings.svelte
-+++ b/sy-progressive-plugin/src/Settings.svelte
-@@ -47,1 +47,1 @@
--    let codeValid = $state(lastVerifyResult() === true);
-+    let codeValid = $state(true);
+diff --git a/sy-tomato-plugin/src/libs/user.ts b/sy-tomato-plugin/src/libs/user.ts
+--- a/sy-tomato-plugin/src/libs/user.ts
++++ b/sy-tomato-plugin/src/libs/user.ts
+@@ -34,1 +34,2 @@
+-    return verifyKey("_siyuanProgressiveCode_")
++    _isValid.set(true);
++    return true;
