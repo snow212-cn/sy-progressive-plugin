@@ -1,0 +1,37 @@
+name: Repository Heartbeat
+
+on:
+  schedule:
+    - cron: "23 3 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: repository-heartbeat
+  cancel-in-progress: false
+
+jobs:
+  heartbeat:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Record heartbeat
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'Last heartbeat: %s\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" > .github/repository-heartbeat.txt
+
+          if git diff --quiet -- .github/repository-heartbeat.txt; then
+            echo "Heartbeat file is already current."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/repository-heartbeat.txt
+          git commit -m "chore: repository heartbeat [skip ci]"
+          git push
