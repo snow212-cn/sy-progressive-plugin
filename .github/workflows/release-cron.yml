@@ -62,7 +62,7 @@ jobs:
           for patch in \
             "$GITHUB_WORKSPACE/patches/user.patch" \
             "$GITHUB_WORKSPACE/patches/Settings.patch" \
-            "$GITHUB_WORKSPACE/patches/IndexConf.patch"
+            # "$GITHUB_WORKSPACE/patches/IndexConf.patch"
           do
             echo "Checking $(basename "$patch")..."
             if ! git apply --check --ignore-whitespace "$patch"; then
