@@ -26,7 +26,8 @@ jobs:
           sparse-checkout: patches
           sparse-checkout-cone-mode: true
 
-      - name: Sync, validate patches, build and release
+      - name: Sync and apply patches
+        id: sync
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -43,8 +44,11 @@ jobs:
 
           if gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release $release_tag already exists. Nothing to build."
+            echo "needed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+
+          echo "needed=true" >> "$GITHUB_OUTPUT"
 
           git clone --depth=1 --filter=blob:none \
             "https://github.com/$UPSTREAM_REPO.git" upstream
@@ -72,6 +76,7 @@ jobs:
           git diff --check
 
       - name: Setup Node.js and restore npm cache
+        if: steps.sync.outputs.needed == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -81,6 +86,7 @@ jobs:
             upstream/sy-progressive-plugin/package-lock.json
 
       - name: Install dependencies in parallel
+        if: steps.sync.outputs.needed == 'true'
         working-directory: upstream
         run: |
 
@@ -97,10 +103,12 @@ jobs:
           exit "$status"
 
       - name: Build progressive plugin
+        if: steps.sync.outputs.needed == 'true'
         working-directory: upstream
         run: npm run build --prefix sy-progressive-plugin
 
       - name: Package and publish
+        if: steps.sync.outputs.needed == 'true'
         working-directory: upstream/sy-progressive-plugin
         run: |
           mkdir -p package/sy-progressive-plugin
