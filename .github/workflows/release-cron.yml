@@ -41,6 +41,7 @@ jobs:
           fi
 
           release_tag="v$package_version"
+          echo "release_tag=$release_tag" >> "$GITHUB_OUTPUT"
 
           if gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release $release_tag already exists. Nothing to build."
@@ -112,15 +113,16 @@ jobs:
         working-directory: upstream/sy-progressive-plugin
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.sync.outputs.release_tag }}
         run: |
           mkdir -p package/sy-progressive-plugin
           cp -a build/. package/sy-progressive-plugin/
           cd package
           zip -qr package.zip sy-progressive-plugin
 
-          gh release create "$release_tag" \
+          gh release create "$RELEASE_TAG" \
             package.zip \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
-            --title "$release_tag" \
+            --title "$RELEASE_TAG" \
             --notes "Automated build from $UPSTREAM_REPO."
