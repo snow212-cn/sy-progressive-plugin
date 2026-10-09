@@ -110,6 +110,8 @@ jobs:
       - name: Package and publish
         if: steps.sync.outputs.needed == 'true'
         working-directory: upstream/sy-progressive-plugin
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p package/sy-progressive-plugin
           cp -a build/. package/sy-progressive-plugin/
